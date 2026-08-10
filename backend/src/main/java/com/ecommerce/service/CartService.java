@@ -8,12 +8,10 @@ import com.ecommerce.repository.CartRepository;
 import com.ecommerce.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class CartService {
 
     @Autowired
@@ -22,31 +20,32 @@ public class CartService {
     @Autowired
     private ProductRepository productRepository;
 
-    public Cart getCart(String userId) {
+    public Cart getCart(Long userId) {
         return cartRepository.findByUserId(userId)
-                .orElse(new Cart(null, userId, new ArrayList<>()));
+                .orElseGet(() -> {
+                    Cart newCart = new Cart(userId);
+                    return cartRepository.save(newCart);
+                });
     }
 
-    public Cart addItem(String userId, CartItemRequest request) {
-        Product product = productRepository.findById(request.getProductId())
+    public Cart addItem(Long userId, CartItemRequest request) {
+        Cart cart = getCart(userId);
+        Long productId = Long.parseLong(request.getProductId());
+
+        Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        if (product.getStock() < request.getQuantity()) {
-            throw new RuntimeException("Insufficient stock");
-        }
+        // Check if item already exists in cart
+        CartItem existing = cart.getItems().stream()
+                .filter(i -> i.getProductId().equals(productId))
+                .findFirst()
+                .orElse(null);
 
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElse(new Cart(null, userId, new ArrayList<>()));
-
-        Optional<CartItem> existing = cart.getItems().stream()
-                .filter(i -> i.getProductId().equals(request.getProductId()))
-                .findFirst();
-
-        if (existing.isPresent()) {
-            existing.get().setQuantity(existing.get().getQuantity() + request.getQuantity());
+        if (existing != null) {
+            existing.setQuantity(existing.getQuantity() + request.getQuantity());
         } else {
             CartItem item = new CartItem(
-                    UUID.randomUUID().toString(),
+                    cart,
                     product.getId(),
                     product.getName(),
                     product.getPrice(),
@@ -59,7 +58,7 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
-    public Cart updateItem(String userId, String itemId, int quantity) {
+    public Cart updateItem(Long userId, Long itemId, int quantity) {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
@@ -75,7 +74,7 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
-    public Cart removeItem(String userId, String itemId) {
+    public Cart removeItem(Long userId, Long itemId) {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
@@ -83,7 +82,7 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
-    public void clearCart(String userId) {
+    public void clearCart(Long userId) {
         cartRepository.findByUserId(userId).ifPresent(cart -> {
             cart.getItems().clear();
             cartRepository.save(cart);

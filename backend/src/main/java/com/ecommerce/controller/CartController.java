@@ -23,7 +23,7 @@ public class CartController {
     @Autowired
     private UserRepository userRepository;
 
-    private String getUserId(Authentication auth) {
+    private Long getUserId(Authentication auth) {
         User user = userRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return user.getId();
@@ -46,7 +46,7 @@ public class CartController {
 
     @PutMapping("/update/{itemId}")
     public ResponseEntity<?> updateItem(Authentication auth,
-                                        @PathVariable String itemId,
+                                        @PathVariable Long itemId,
                                         @RequestParam int quantity) {
         try {
             Cart cart = cartService.updateItem(getUserId(auth), itemId, quantity);
@@ -57,7 +57,7 @@ public class CartController {
     }
 
     @DeleteMapping("/remove/{itemId}")
-    public ResponseEntity<?> removeItem(Authentication auth, @PathVariable String itemId) {
+    public ResponseEntity<?> removeItem(Authentication auth, @PathVariable Long itemId) {
         try {
             Cart cart = cartService.removeItem(getUserId(auth), itemId);
             return ResponseEntity.ok(cart);

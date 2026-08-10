@@ -10,7 +10,8 @@ set MAVEN_HOME=%USERPROFILE%\maven\apache-maven-3.9.6
 set PATH=%MAVEN_HOME%\bin;%PATH%
 
 echo Starting Spring Boot backend on port 8080...
-echo Make sure MongoDB is running on port 27017!
+echo Make sure MySQL is running on port 3306!
+echo Database: ecommerce_db (will be created automatically)
 echo.
 echo Admin credentials: admin@ecommerce.com / Admin@123
 echo.

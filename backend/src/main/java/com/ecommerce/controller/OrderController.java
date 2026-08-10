@@ -24,7 +24,7 @@ public class OrderController {
     @Autowired
     private UserRepository userRepository;
 
-    private String getUserId(Authentication auth) {
+    private Long getUserId(Authentication auth) {
         User user = userRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return user.getId();

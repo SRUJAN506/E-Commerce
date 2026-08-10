@@ -1,14 +1,14 @@
 package com.ecommerce.repository;
 
 import com.ecommerce.model.Product;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface ProductRepository extends MongoRepository<Product, String> {
-    List<Product> findByCategoryId(String categoryId);
+public interface ProductRepository extends JpaRepository<Product, Long> {
+    List<Product> findByCategory_Id(Long categoryId);
     List<Product> findByNameContainingIgnoreCase(String name);
-    List<Product> findByCategoryIdAndNameContainingIgnoreCase(String categoryId, String name);
+    List<Product> findByCategory_IdAndNameContainingIgnoreCase(Long categoryId, String name);
 }

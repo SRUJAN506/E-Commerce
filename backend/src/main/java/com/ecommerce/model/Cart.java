@@ -1,30 +1,35 @@
 package com.ecommerce.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "carts")
+@Entity
+@Table(name = "carts")
 public class Cart {
 
     @Id
-    private String id;
-    private String userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "user_id", nullable = false, unique = true)
+    private Long userId;
+
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<CartItem> items = new ArrayList<>();
 
     public Cart() {}
 
-    public Cart(String id, String userId, List<CartItem> items) {
-        this.id = id; this.userId = userId;
-        this.items = items != null ? items : new ArrayList<>();
+    public Cart(Long userId) {
+        this.userId = userId;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
     public List<CartItem> getItems() { return items; }
     public void setItems(List<CartItem> items) { this.items = items; }
 }

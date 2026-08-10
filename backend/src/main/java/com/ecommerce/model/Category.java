@@ -1,24 +1,28 @@
 package com.ecommerce.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
 
-@Document(collection = "categories")
+@Entity
+@Table(name = "categories")
 public class Category {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true)
     private String name;
+
     private String description;
 
     public Category() {}
 
-    public Category(String id, String name, String description) {
-        this.id = id; this.name = name; this.description = description;
+    public Category(String name, String description) {
+        this.name = name; this.description = description;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     public String getDescription() { return description; }

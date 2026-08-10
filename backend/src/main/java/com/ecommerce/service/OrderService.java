@@ -8,11 +8,13 @@ import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Transactional
 public class OrderService {
 
     @Autowired
@@ -30,7 +32,7 @@ public class OrderService {
     @Autowired
     private CartService cartService;
 
-    public Order placeOrder(String userId, OrderRequest request) {
+    public Order placeOrder(Long userId, OrderRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -41,9 +43,18 @@ public class OrderService {
             throw new RuntimeException("Cart is empty");
         }
 
+        // Build order first (needed for OrderItem references)
+        Order order = new Order();
+        order.setUserId(userId);
+        order.setUserName(user.getName());
+        order.setStatus("PENDING");
+        order.setShippingAddress(request.getShippingAddress());
+        order.setCreatedAt(LocalDateTime.now());
+
         // Convert cart items to order items (price snapshot)
         List<OrderItem> orderItems = cart.getItems().stream()
                 .map(ci -> new OrderItem(
+                        order,
                         ci.getProductId(),
                         ci.getProductName(),
                         ci.getPrice(),
@@ -57,15 +68,8 @@ public class OrderService {
                 .mapToDouble(i -> i.getPrice() * i.getQuantity())
                 .sum();
 
-        // Build order
-        Order order = new Order();
-        order.setUserId(userId);
-        order.setUserName(user.getName());
         order.setItems(orderItems);
         order.setTotalAmount(totalAmount);
-        order.setStatus("PENDING");
-        order.setShippingAddress(request.getShippingAddress());
-        order.setCreatedAt(LocalDateTime.now());
 
         // Decrement product stock
         orderItems.forEach(item ->
@@ -81,7 +85,7 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public List<Order> getUserOrders(String userId) {
+    public List<Order> getUserOrders(Long userId) {
         return orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
@@ -89,7 +93,7 @@ public class OrderService {
         return orderRepository.findAllByOrderByCreatedAtDesc();
     }
 
-    public Order updateStatus(String orderId, String status) {
+    public Order updateStatus(Long orderId, String status) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         order.setStatus(status);

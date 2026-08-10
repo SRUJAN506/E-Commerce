@@ -69,7 +69,7 @@ const OrderHistoryPage = () => {
                   <div className="d-flex align-items-center gap-2 mb-1">
                     <FiPackage style={{ color: 'var(--primary)' }} />
                     <span style={{ fontWeight: 700, fontFamily: 'monospace' }}>
-                      #{order.id.slice(-10).toUpperCase()}
+                      #{String(order.id).slice(-10).toUpperCase()}
                     </span>
                   </div>
                   <div className="d-flex align-items-center gap-1" style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>

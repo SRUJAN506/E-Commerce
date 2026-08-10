@@ -23,9 +23,9 @@ public class ProductService {
 
     public List<Product> getAll(String categoryId, String search) {
         if (categoryId != null && !categoryId.isBlank() && search != null && !search.isBlank()) {
-            return productRepository.findByCategoryIdAndNameContainingIgnoreCase(categoryId, search);
+            return productRepository.findByCategory_IdAndNameContainingIgnoreCase(Long.parseLong(categoryId), search);
         } else if (categoryId != null && !categoryId.isBlank()) {
-            return productRepository.findByCategoryId(categoryId);
+            return productRepository.findByCategory_Id(Long.parseLong(categoryId));
         } else if (search != null && !search.isBlank()) {
             return productRepository.findByNameContainingIgnoreCase(search);
         }
@@ -33,11 +33,11 @@ public class ProductService {
     }
 
     public Optional<Product> getById(String id) {
-        return productRepository.findById(id);
+        return productRepository.findById(Long.parseLong(id));
     }
 
     public Product create(ProductRequest request) {
-        Category category = categoryRepository.findById(request.getCategoryId())
+        Category category = categoryRepository.findById(Long.parseLong(request.getCategoryId()))
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
         Product product = new Product();
@@ -46,18 +46,17 @@ public class ProductService {
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
         product.setImageUrl(request.getImageUrl());
-        product.setCategoryId(request.getCategoryId());
-        product.setCategoryName(category.getName());
+        product.setCategory(category);
         product.setCreatedAt(LocalDateTime.now());
 
         return productRepository.save(product);
     }
 
     public Product update(String id, ProductRequest request) {
-        Product product = productRepository.findById(id)
+        Product product = productRepository.findById(Long.parseLong(id))
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        Category category = categoryRepository.findById(request.getCategoryId())
+        Category category = categoryRepository.findById(Long.parseLong(request.getCategoryId()))
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
         product.setName(request.getName());
@@ -65,13 +64,12 @@ public class ProductService {
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
         product.setImageUrl(request.getImageUrl());
-        product.setCategoryId(request.getCategoryId());
-        product.setCategoryName(category.getName());
+        product.setCategory(category);
 
         return productRepository.save(product);
     }
 
     public void delete(String id) {
-        productRepository.deleteById(id);
+        productRepository.deleteById(Long.parseLong(id));
     }
 }

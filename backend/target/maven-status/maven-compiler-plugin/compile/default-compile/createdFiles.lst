@@ -1,5 +1,6 @@
 com\ecommerce\model\Cart.class
 com\ecommerce\model\Order.class
+com\ecommerce\dto\ReviewRequest.class
 com\ecommerce\dto\AuthResponse.class
 com\ecommerce\service\CategoryService.class
 com\ecommerce\service\ProductService.class
@@ -11,9 +12,12 @@ com\ecommerce\model\Product.class
 com\ecommerce\security\JwtAuthenticationFilter.class
 com\ecommerce\dto\AuthRequest.class
 com\ecommerce\model\CartItem.class
+com\ecommerce\repository\ReviewRepository.class
+com\ecommerce\controller\ReviewController.class
 com\ecommerce\model\OrderItem.class
 com\ecommerce\security\JwtTokenProvider.class
 com\ecommerce\dto\OrderRequest.class
+com\ecommerce\model\Review.class
 com\ecommerce\controller\AuthController.class
 com\ecommerce\EcommerceApplication.class
 com\ecommerce\security\SecurityConfig.class
@@ -21,6 +25,7 @@ com\ecommerce\dto\ProductRequest.class
 com\ecommerce\service\OrderService.class
 com\ecommerce\controller\UserController.class
 com\ecommerce\dto\CartItemRequest.class
+com\ecommerce\service\ReviewService.class
 com\ecommerce\model\Category.class
 com\ecommerce\repository\OrderRepository.class
 com\ecommerce\controller\ProductController.class
